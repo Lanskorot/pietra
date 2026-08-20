@@ -1,0 +1,216 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Pietra{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Normalize.css (опционально) -->
+    <link rel="stylesheet" href="{% static 'css/normalize.css' %}" />
+    <!-- Пользовательские стили -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <!-- Подключаем JS -->
+    <script src="{% static 'js/main.js' %}" defer></script>
+    <link
+      rel="shortcut icon"
+      href="{% static 'images/logo2.svg' %}"
+      type="image/svg+xml"
+    />
+  </head>
+  <body class="bg-zinc-50">
+    <div id="app">
+      <!-- Шапка (Header) -->
+      <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center h-16">
+            <div class="flex items-center">
+              <a href="{% url 'main:home' %}" class="block">
+                <img src="{% static 'images/logo1.svg' %}" alt="StoneTools" class="logo_img" />
+              </a>
+            </div>
+            <!-- Десктопная навигация -->
+            <nav class="hidden md:flex space-x-8">
+              <a href="{% url 'main:home' %}" class="nav-link text-zinc-600 hover:text-zinc-900" >Главная</a >
+
+                            <!-- Каталог с выпадающим меню -->
+              <div class="relative group">
+                  <a href="{% url 'main:catalog' %}" class="nav-link text-zinc-600 hover:text-zinc-900 inline-flex items-center">
+                      Каталог
+                      <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                  </a>
+                  <!-- Мостик, чтобы наведение не обрывалось -->
+                  <div class="absolute left-0 w-56 h-3 top-full -mt-1"></div>
+                  <!-- Выпадающее меню -->
+                  <div class="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-20 border border-zinc-100">
+                      {% for cat in categories_menu %}
+                          <a href="{% url 'main:catalog' %}?category={{ cat.name }}" class="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-100 transition-colors">
+                              {{ cat.name }}
+                          </a>
+                      {% endfor %}
+                  </div>
+              </div>
+
+
+              <a href="{% url 'main:services' %}" class="nav-link text-zinc-600 hover:text-zinc-900" >Услуги</a>
+              <a href="{% url 'main:works_and_products' %}" class="nav-link text-zinc-600 hover:text-zinc-900" >Работы и изделия из камня</a>
+              <a href="{% url 'main:articles' %}" class="nav-link text-zinc-600 hover:text-zinc-900" >Статьи</a>
+
+
+              <a href="{% url 'main:about' %}" class="nav-link text-zinc-600 hover:text-zinc-900" >О нас</a>
+              <a href="{% url 'main:contact' %}" class="nav-link text-zinc-600 hover:text-zinc-900" >Контакты</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+              <a href="{% url 'main:profile' %}" class="relative p-2 hover:bg-zinc-100 rounded-full transition-colors">
+                  <img src="{% static 'images/icons/shopping-cart.svg' %}" alt="Корзина" class="w-6 h-6 text-zinc-700" />
+                  <span class="cart-count hidden absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      0
+                  </span>
+              </a>
+              <!-- Кнопка мобильного меню -->
+              <button id="mobileMenuBtn" class="md:hidden p-2 hover:bg-zinc-100 rounded-full" >
+                <svg class="w-6 h-6 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" ></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <!-- Мобильное меню (скрыто) -->
+          <div id="mobileMenu" class="md:hidden hidden py-4 border-t">
+            <a href="{% url 'main:home' %}" class="mobile-nav-link block w-full text-left py-2 px-4 text-zinc-900 font-semibold bg-zinc-50">Главная</a>
+
+
+            <div class="w-full">
+                <a href="{% url 'main:catalog' %}" class="mobile-nav-link block w-full text-left py-2 px-4 text-zinc-600 hover:bg-zinc-50 flex items-center justify-between">
+                    <span>Каталог</span>
+                    <span class="text-xs">▼</span>
+                </a>
+                <!-- Список категорий (вложенный) -->
+                <div class="pl-6">
+                    {% for cat in categories_menu %}
+                        <a href="{% url 'main:catalog' %}?category={{ cat.name }}" class="block py-2 px-4 text-sm text-zinc-600 hover:bg-zinc-50 border-b border-zinc-50">
+                            {{ cat.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+
+            <a href="{% url 'main:services' %}" class="mobile-nav-link block w-full text-left py-2 px-4 text-zinc-600 hover:bg-zinc-50">Услуги</a>
+            <a href="{% url 'main:works_and_products' %}" class="mobile-nav-link block w-full text-left py-2 px-4 text-zinc-600 hover:bg-zinc-50">Работы и изделия из камня</a>
+            <a href="{% url 'main:articles' %}" class="mobile-nav-link block w-full text-left py-2 px-4 text-zinc-600 hover:bg-zinc-50">Статьи</a>
+            <a href="{% url 'main:about' %}" class="mobile-nav-link block w-full text-left py-2 px-4 text-zinc-600 hover:bg-zinc-50">О нас</a>
+            </div>
+        </div>
+      </header>
+
+      <!-- Основной контент (разные страницы) -->
+      <main>{% block content %} {% endblock %}</main>
+
+      
+
+
+
+
+
+
+<!-- Lightbox (увеличенный просмотр изображений) -->
+<div id="lightbox" class="fixed inset-0 z-[999] bg-black/80 flex items-center justify-center hidden" onclick="closeLightbox(event)">
+    <div class="relative max-w-4xl w-full mx-4" onclick="event.stopPropagation()">
+        <!-- Кнопка закрытия -->
+        <button class="absolute -top-12 right-0 text-white text-4xl hover:text-zinc-300 transition-colors" onclick="closeLightbox()">✕</button>
+        <!-- Контейнер изображения -->
+        <div class="relative bg-white/10 rounded-lg overflow-hidden">
+            <img id="lightbox-img" src="" alt="Product" class="w-full h-auto max-h-[80vh] object-contain">
+            <!-- Кнопки навигации -->
+            <button id="lightbox-prev" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-3 rounded-full hover:bg-black/70 transition-colors hidden">‹</button>
+            <button id="lightbox-next" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-3 rounded-full hover:bg-black/70 transition-colors hidden">›</button>
+            <!-- Индикаторы (точки) -->
+            <div id="lightbox-dots" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+      <!-- Футер (Footer) -->
+      <footer class="bg-zinc-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 py-12">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h3 class="text-2xl font-bold mb-4">Pietra</h3>
+              <p class="text-zinc-400 mb-4">
+                Профессиональные инструменты для работы с камнем
+              </p>
+              <div class="flex space-x-4"></div>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-4">Каталог</h4>
+              <ul class="space-y-2 text-zinc-400">
+                {% for cat in categories_menu %}
+                        <li>
+                          <a href="{% url 'main:catalog' %}?category={{ cat.name }}" class="hover:text-white">
+                              {{ cat.name }}
+                          </a>
+                        </li>
+                {% endfor %}
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-4">Информация</h4>
+              <ul class="space-y-2 text-zinc-400">
+                <li>
+                  <a href="{% url 'main:about' %}" data-nav="about" class="hover:text-white" >О компании</a>
+                </li>
+                <li><a href="{% url 'main:services' %}" class="hover:text-white">Услуги</a></li>
+                <li><a href="{% url 'main:works_and_products' %}" class="hover:text-white">Работы и изделия из камня</a></li>
+                <li><a href="{% url 'main:articles' %}" class="hover:text-white">Статьи</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-4">Контакты</h4>
+              <ul class="space-y-3 text-zinc-400">
+                <li class="flex items-start">
+                  <a href="tel:+79881166939" class="flex items-start gap-2 hover:text-white transition-colors" >
+                    <img src="{% static 'images/icons/phone.svg' %}" alt="телефон" class="w-6 h-6" />
+                    <span>+7 (988) 116-69-39</span>
+                  </a>
+                </li>
+                <li class="flex items-start">
+                  <a href="mailto:mpietra26@inbox.ru" class="flex items-start gap-2 hover:text-white transition-colors" >
+                    <img src="{% static 'images/icons/mail.svg' %}" alt="mail" class="w-6 h-6" />
+                    <span>mpietra26@inbox.ru</span>
+                  </a>
+                </li>
+                <li class="flex items-start">
+                  {# Основная ссылка, которая будет определять устройство #}
+                  <a href="https://yandex.ru/maps/?text=Ставропольский край, Шпаковский район, г. Михайловск, ул. Константинова, 20" target="_blank" rel="noopener noreferrer" class="flex items-start gap-2 hover:text-white transition-colors"
+                    {# Атрибуты data-device заставляют браузер обработать ссылку как путь к приложению и попытаться открыть его#}
+                    data-device-ios="yandexmaps://maps.yandex.ru/?text=Ставропольский край, Шпаковский район, г. Михайловск, ул. Константинова, 20"
+                    data-device-android="yandexmaps://maps.yandex.ru/?text=Ставропольский край, Шпаковский район, г. Михайловск, ул. Константинова, 20" >
+                    <img src="{% static 'images/icons/map-pin.svg' %}" alt="адрес" class="w-6 h-6" />
+                    <span>г. Михайловск, ул. Константинова, д.20</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="border-t border-zinc-800 pt-8 text-center text-zinc-400 text-sm" >
+            © 2026 Pietra. Все права защищены.
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

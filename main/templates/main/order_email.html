@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .order { border: 1px solid #ccc; padding: 15px; }
+        .item { margin: 5px 0; }
+        .total { font-weight: bold; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+    <h2>🛒 Новый заказ PIETRA STORE!</h2>
+    <p><strong>Пользователь:</strong> {{ username }}</p>
+    <p><strong>Email:</strong> {{ email }}</p>
+    <p><strong>Телефон:</strong> {{ phone }}</p>
+    <h3>Товары:</h3>
+    <ul>
+    {% for item in items %}
+        <li>{{ item.name }} x {{ item.quantity }} = {{ item.subtotal }} ₽</li>
+    {% endfor %}
+    </ul>
+    <p class="total">Итого: {{ total }} ₽</p>
+</body>
+</html>

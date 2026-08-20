@@ -1,0 +1,73 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block title %}Pietra | Вход{% endblock %}
+
+{% block content %}
+<section class="min-h-[calc(100vh-200px)] flex items-center justify-center py-12 px-4 bg-zinc-50">
+    <div class="max-w-5xl w-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+        <!-- Левая часть: изображение (на мобильных скрывается, на планшетах/десктопе показывается) -->
+        <div class="md:w-1/2 relative hidden md:block">
+            <img src="https://images.unsplash.com/photo-1757176295165-ed90170531d5?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fCVEMCU5QSVEMSU4MCVEMCVCMCVEMSU4MSVEMCVCOCVEMCVCMiVEMSU4QiVEMCVCOSUyMCVEMCVCQSVEMCVCMCVEMCVCQyVEMCVCNSVEMCVCRCVEMSU4Q3xlbnwwfHwwfHx8MA%3D%3D" 
+                 alt="Вход в личный кабинет" 
+                 class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-8">
+                <div class="text-white">
+                    <h3 class="text-2xl font-bold mb-2">Добро пожаловать!</h3>
+                    <p class="text-zinc-200">Войдите в свой аккаунт, чтобы управлять заказами и отслеживать статус.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая часть: форма -->
+        <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-zinc-900">Вход</h2>
+                <p class="text-zinc-500 mt-1">Введите свои данные для входа</p>
+            </div>
+
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+
+                <!-- Вывод общих ошибок формы -->
+                {% if form.non_field_errors %}
+                    <div class="bg-red-50 text-red-700 p-3 rounded-lg text-sm">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <!-- Поле username -->
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-zinc-700 mb-1">
+                        Имя пользователя
+                    </label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <p class="text-red-600 text-xs mt-1">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Поле password -->
+                <div>
+                    <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-zinc-700 mb-1">
+                        Пароль
+                    </label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <p class="text-red-600 text-xs mt-1">{{ form.password.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-medium py-3 rounded-lg transition-colors">
+                    Войти
+                </button>
+            </form>
+
+            <div class="mt-6 text-center text-sm text-zinc-600">
+                Нет аккаунта? 
+                <a href="{% url 'main:register' %}" class="text-zinc-900 font-semibold hover:underline">Зарегистрируйтесь</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Pietra | Услуги{% endblock %}
+
+{% block content %}
+<div id="section-services" class="page-section">
+    <!-- Заголовок -->
+    <section class="py-16 px-4 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Наши услуги</h2>
+            <p class="text-center text-zinc-600 max-w-2xl mx-auto mb-12 text-lg">
+                Профессиональная обработка камня любой сложности — от художественной резьбы до полной реставрации и защиты.
+            </p>
+
+            <!-- Сетка услуг: 2 колонки -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {% for service in services %}
+                <div class="service-card bg-white rounded-lg shadow-sm hover:shadow-lg transition overflow-hidden group flex flex-col">
+                    <!-- Изображение -->
+                    <div class="aspect-video relative overflow-hidden bg-zinc-100">
+                        <img src="{{ service.image }}" alt="{{ service.name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-zinc-800 text-sm px-3 py-1 rounded-full shadow">
+                            {{ service.category }}
+                        </span>
+                    </div>
+                    <!-- Контент -->
+                    <div class="p-6 flex flex-col flex-1">
+                        <h3 class="font-semibold text-xl mb-2">{{ service.name }}</h3>
+                        <p class="text-zinc-600 text-sm mb-4 flex-1 leading-relaxed">
+                            {{ service.description }}
+                        </p>
+                        <div class="flex items-center justify-between mt-auto pt-2 border-t border-zinc-100">
+                            <div>
+                                {% if service.price > 0 %}
+                                <span class="text-2xl font-bold">{{ service.price|intcomma }} ₽</span>
+                                {% else %}
+                                <span class="text-green-600 font-semibold">Бесплатно</span>
+                                {% endif %}
+                                <div class="flex items-center mt-1">
+                                    <span class="text-yellow-500">★</span>
+                                    <span class="ml-1 text-sm text-zinc-600">{{ service.rating }}</span>
+                                </div>
+                            </div>
+                            <!-- Кнопка заказа услуги -->
+                            <button class="bg-zinc-900 hover:bg-zinc-800 text-white px-5 py-2 rounded-lg transition-colors text-sm font-medium order-service-btn" data-id="{{ service.id }}">
+                                Заказать услугу
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="col-span-full text-center text-zinc-500">Услуги временно не добавлены.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Блок преимуществ (оставлен) -->
+    <section class="py-16 px-4 bg-zinc-50">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div>
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-zinc-900 text-white rounded-full mb-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Опыт 15+ лет</h4>
+                    <p class="text-zinc-600">Мы работаем с камнем с 2010 года и знаем все нюансы.</p>
+                </div>
+                <div>
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-zinc-900 text-white rounded-full mb-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"></path>
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Гарантия качества</h4>
+                    <p class="text-zinc-600">Используем только проверенные материалы и технологии.</p>
+                </div>
+                <div>
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-zinc-900 text-white rounded-full mb-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Индивидуальный подход</h4>
+                    <p class="text-zinc-600">Учитываем все пожелания клиента и предлагаем оптимальное решение.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Модальное окно заказа услуги -->
+<div id="serviceOrderModal" class="fixed inset-0 z-[999] bg-black/50 flex items-center justify-center hidden" onclick="closeServiceModal(event)">
+    <div class="bg-white rounded-lg max-w-md w-full mx-4 p-6 relative" onclick="event.stopPropagation()">
+        <button class="absolute top-4 right-4 text-zinc-500 hover:text-zinc-700" onclick="closeServiceModal()">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        <h3 class="text-2xl font-bold mb-4">Заказать услугу</h3>
+        <p class="text-zinc-600 mb-4">Оставьте свои контактные данные, и мы свяжемся с вами в ближайшее время.</p>
+        <form id="serviceOrderForm" class="space-y-4">
+            <div>
+                <label for="serviceName" class="block text-sm font-medium text-zinc-700 mb-1">Ваше имя</label>
+                <input type="text" id="serviceName" class="w-full px-4 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-zinc-500 focus:border-transparent" placeholder="Иван Иванов" required>
+            </div>
+            <div>
+                <label for="servicePhone" class="block text-sm font-medium text-zinc-700 mb-1">Номер телефона</label>
+                <input type="tel" id="servicePhone" class="w-full px-4 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-zinc-500 focus:border-transparent" placeholder="+7 (999) 123-45-67" required>
+            </div>
+            <div>
+                <label for="serviceEmail" class="block text-sm font-medium text-zinc-700 mb-1">Email (опционально)</label>
+                <input type="email" id="serviceEmail" class="w-full px-4 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-zinc-500 focus:border-transparent" placeholder="example@mail.ru">
+            </div>
+            <div>
+                <label for="serviceComment" class="block text-sm font-medium text-zinc-700 mb-1">Комментарий</label>
+                <textarea id="serviceComment" rows="3" class="w-full px-4 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-zinc-500 focus:border-transparent" placeholder="Дополнительная информация..."></textarea>
+            </div>
+            <button type="submit" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-medium py-3 rounded-lg transition-colors">
+                Отправить заявку
+            </button>
+        </form>
+        <div class="mt-4 text-center text-sm text-zinc-500">
+            Или позвоните нам: <a href="tel:+79881166939" class="text-zinc-900 font-semibold hover:underline">+7 (988) 116-69-39</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

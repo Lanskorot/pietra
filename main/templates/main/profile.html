@@ -1,0 +1,204 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Pietra | Профиль и корзина{% endblock %}
+
+{% block content %}
+<section class="py-12 px-4 bg-zinc-50 min-h-[calc(100vh-200px)]">
+    <div class="max-w-6xl mx-auto">
+        <!-- Приветствие и информация о пользователе -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-zinc-900">Здравствуйте, {{ user.username }}!</h2>
+                    <p class="text-zinc-500">{{ user.email }}</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="{% url 'main:home' %}" class="text-zinc-600 hover:text-zinc-900 transition">На главную</a>
+                    <form action="{% url 'main:logout' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition text-sm font-medium">
+                            Выйти
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Корзина -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-zinc-900">Корзина</h3>
+                <span class="text-sm text-zinc-500" id="cartCount"></span>
+            </div>
+
+            <!-- Контейнер для товаров корзины -->
+            <div id="cartItems">
+                <!-- Сюда рендерится JS -->
+                <div class="text-center py-8 text-zinc-500">Загрузка...</div>
+            </div>
+
+            <!-- Итог -->
+            <div class="mt-6 pt-6 border-t border-zinc-200 flex flex-wrap items-center justify-between gap-4">
+                <span class="text-lg font-semibold">Итого:</span>
+                <span class="text-2xl font-bold" id="cartTotal">0 ₽</span>
+            </div>
+
+            <!-- Кнопка очистки и оформления -->
+            <div class="mt-4 flex flex-wrap gap-4">
+                <button id="clearCartBtn" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg transition text-sm font-medium">
+                    Очистить корзину
+                </button>
+                <button id="checkoutBtn" class="bg-zinc-900 hover:bg-zinc-800 text-white px-5 py-2 rounded-lg transition text-sm font-medium">
+                    Оформить заказ
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Модальное окно подтверждения заказа -->
+<div id="orderConfirmationModal" class="fixed inset-0 z-[999] bg-black/50 flex items-center justify-center hidden" onclick="closeOrderConfirmationModal(event)">
+    <div class="bg-white rounded-lg max-w-md w-full mx-4 p-6 relative" onclick="event.stopPropagation()">
+        <button class="absolute top-4 right-4 text-zinc-500 hover:text-zinc-700" onclick="closeOrderConfirmationModal()">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        <h3 class="text-2xl font-bold mb-4">Заказ оформлен!</h3>
+        <p class="text-zinc-600 mb-4">Спасибо за покупку! Для более быстрой обработки заказа, укажите ваш номер телефона:</p>
+        <form id="orderPhoneForm" class="space-y-4">
+            <div>
+                <label for="orderPhone" class="block text-sm font-medium text-zinc-700 mb-1">Номер телефона</label>
+                <input type="tel" id="orderPhone" class="w-full px-4 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-zinc-500 focus:border-transparent" placeholder="+7 (999) 123-45-67">
+            </div>
+            <button type="submit" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-medium py-2 rounded-lg transition-colors">
+                Отправить
+            </button>
+            <button type="button" onclick="closeOrderConfirmationModal()" class="w-full text-zinc-500 hover:text-zinc-700 text-sm">
+                Пропустить
+            </button>
+        </form>
+        <div class="mt-4 text-center text-sm text-zinc-500">
+            Мы свяжемся с вами в ближайшее время.
+        </div>
+    </div>
+</div>
+
+<!-- Передаём все товары в JS -->
+<script>
+    // Передаём все товары в глобальную переменную для рендеринга корзины
+    window.allProducts = {{ all_products|safe }};
+</script>
+
+<script>
+    // Получение CSRF-токена
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Функции модального окна
+    function openOrderConfirmationModal() {
+        document.getElementById('orderConfirmationModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeOrderConfirmationModal(event) {
+        if (event && event.target !== event.currentTarget) return;
+        document.getElementById('orderConfirmationModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        document.getElementById('orderPhoneForm').reset();
+    }
+
+    // Функция отправки телефона на сервер
+    function sendPhone(phone) {
+        fetch('{% url "main:update_order_phone" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ phone: phone })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                alert('Спасибо! Мы свяжемся с вами в ближайшее время.');
+            } else {
+                alert('Ошибка при отправке номера телефона: ' + data.message);
+            }
+            closeOrderConfirmationModal();
+        })
+        .catch(error => {
+            alert('Ошибка при отправке номера телефона');
+            closeOrderConfirmationModal();
+        });
+    }
+
+    // Очистка корзины
+    document.getElementById('clearCartBtn').addEventListener('click', function() {
+        if (confirm('Удалить все товары из корзины?')) {
+            localStorage.removeItem('cart');
+            updateCartCount();
+            renderCart();
+        }
+    });
+
+    // Оформление заказа
+    document.getElementById('checkoutBtn').addEventListener('click', function() {
+        const cart = getCart();
+        if (cart.length === 0) {
+            alert('Корзина пуста');
+            return;
+        }
+
+        fetch('{% url "main:create_order" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ products: cart })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                localStorage.removeItem('cart');
+                updateCartCount();
+                renderCart();
+                openOrderConfirmationModal();
+            } else {
+                alert('Ошибка: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Произошла ошибка при отправке заказа');
+            console.error(error);
+        });
+    });
+
+    // Обработка отправки формы с телефоном
+    document.getElementById('orderPhoneForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const phone = document.getElementById('orderPhone').value.trim();
+        sendPhone(phone);
+    });
+
+    // Кнопка "Пропустить" — отправляем пустой телефон
+    document.querySelector('#orderConfirmationModal button[type="button"]').addEventListener('click', function() {
+        sendPhone('');
+    });
+</script>
+{% endblock %}

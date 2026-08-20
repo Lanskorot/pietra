@@ -1,0 +1,79 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Pietra | Статьи{% endblock %}
+
+{% block content %}
+<div id="section-articles" class="page-section">
+    <section class="py-16 px-4 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Статьи</h2>
+            <p class="text-center text-zinc-600 max-w-2xl mx-auto mb-12 text-lg">
+                Полезные материалы по обработке камня, выбору инструментов и технологиям.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for article in articles %}
+                <div class="article-card bg-white rounded-lg shadow-sm hover:shadow-lg transition overflow-hidden group flex flex-col">
+                    <div class="aspect-video relative overflow-hidden bg-zinc-100">
+                        <img src="{{ article.image }}" alt="{{ article.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-zinc-800 text-sm px-3 py-1 rounded-full shadow">
+                            {{ article.category }}
+                        </span>
+                        <span class="absolute bottom-4 left-4 bg-black/70 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm">
+                            {{ article.date|date:"d.m.Y" }}
+                        </span>
+                    </div>
+                    <div class="p-6 flex flex-col flex-1">
+                        <h3 class="font-semibold text-xl mb-2 line-clamp-2">{{ article.title }}</h3>
+                        <p class="text-zinc-600 text-sm mb-4 flex-1 leading-relaxed line-clamp-3">
+                            {{ article.short_description }}
+                        </p>
+                        <div class="flex items-center justify-between mt-auto pt-2 border-t border-zinc-100">
+                            <div class="flex items-center gap-2 text-sm text-zinc-500">
+                                <span>{{ article.author }}</span>
+                                <span>•</span>
+                                <span>👁️ {{ article.views|intcomma }}</span>
+                            </div>
+                            <button class="read-more-btn bg-zinc-900 hover:bg-zinc-800 text-white px-4 py-1.5 rounded-lg transition-colors text-sm font-medium"
+                                    data-id="{{ article.id }}"
+                                    data-title="{{ article.title }}"
+                                    data-content="{{ article.content|escape }}"
+                                    data-meta="{{ article.author }} • {{ article.date|date:'d.m.Y' }} • 👁️ {{ article.views|intcomma }}">
+                                Читать далее
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="col-span-full text-center text-zinc-500">Статьи пока не добавлены.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Модальное окно -->
+<div id="articleModal" class="fixed inset-0 z-[999] bg-black/50 flex items-center justify-center hidden" onclick="closeArticleModal(event)">
+    <div class="bg-white rounded-lg max-w-2xl w-full mx-4 p-6 relative max-h-[90vh] flex flex-col" onclick="event.stopPropagation()">
+        <button class="absolute top-4 right-4 text-zinc-500 hover:text-zinc-700" onclick="closeArticleModal()">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        <div class="overflow-y-auto flex-1 pr-2">
+            <h3 id="articleModalTitle" class="text-2xl font-bold mb-4"></h3>
+            <div id="articleModalContent" class="prose prose-zinc max-w-none">
+                <!-- full text -->
+            </div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-zinc-100 flex justify-between items-center">
+            <div id="articleModalMeta" class="text-sm text-zinc-500"></div>
+            <button class="bg-zinc-900 hover:bg-zinc-800 text-white px-5 py-2 rounded-lg transition-colors" onclick="closeArticleModal()">
+                Закрыть
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

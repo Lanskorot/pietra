@@ -1,0 +1,81 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Pietra | Главная{% endblock %}
+
+{% block content %}
+<div id="section-home" class="page-section">
+    <!-- Hero слайдер -->
+    <section class="relative h-[600px] overflow-hidden bg-zinc-900" id="heroSlider"></section>
+    
+
+    <!-- Категории -->
+    <section class="py-16 px-4 bg-white">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Категории товаров</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                {% for category in categories %}
+                    <a href="{% url 'main:catalog' %}?category={{ category.name }}" class="hover:text-white">
+                                {{ cat.name }}
+
+                        <button data-nav="catalog" class="group relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
+                            <div class="aspect-square relative">
+                                <img src="{{category.image}}" alt="{{category.name}}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                                <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                                    <div class="text-3xl mb-2">
+                                        <img src="{% static category.icon %}" alt="{{category.name}}" class="w-8 h-8 inline">
+                                    </div>
+                                    <h3 class="text-xl font-semibold">{{category.name}}</h3>
+                                </div>
+                            </div>
+                        </button>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Популярные товары -->
+    <section class="py-16 px-4 bg-zinc-50">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold">Популярные товары</h2>
+                <a href="{% url 'main:catalog' %}">
+                    <button  class="text-zinc-600 hover:text-zinc-900 font-semibold transition-colors">Смотреть все →</button>
+                </a>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" >
+                {% for p in popular_product %}
+                    <a href="{% url 'main:product_detail' p.id %}" class="block">
+                        <div class="product-card ...">
+                            <div class="bg-white rounded-lg shadow-sm hover:shadow-lg transition overflow-hidden group">
+                                <div class="aspect-square relative overflow-hidden bg-zinc-100">
+                                    <img src="{{p.image}}" alt="{{p.name}}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+                                    <div class="absolute top-4 right-4"><span class="bg-white px-3 py-1 rounded-full text-sm font-semibold">{{p.category}}</span></div>
+                                </div>
+                                <div class="p-4">
+                                    <h3 class="font-semibold text-lg mb-2">{{p.name}}</h3>
+                                    <div class="flex items-center mb-3"><span class="text-yellow-500">★</span> <span class="ml-1 text-sm text-zinc-600">{{p.rating}}</span></div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-2xl font-bold">{{ p.price|intcomma }} ₽</span>
+                                        <button class="bg-zinc-900 hover:bg-zinc-800 text-white p-2 rounded-lg transition add-to-cart" data-id="{{p.id}}">
+                                            <svg class="w-5 h-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <img src="{% static 'images/icons/shopping-cart-white.svg' %}" alt="Корзина" class="w-6 h-6 text-zinc-700" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+
+
+                    
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

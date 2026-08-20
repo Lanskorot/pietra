@@ -1,0 +1,75 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Pietra | {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-12">
+    <!-- Хлебные крошки (опционально) -->
+    <nav class="text-sm text-zinc-500 mb-6">
+        <a href="{% url 'main:home' %}" class="hover:text-zinc-900">Главная</a>
+        <span class="mx-2">/</span>
+        <a href="{% url 'main:catalog' %}" class="hover:text-zinc-900">Каталог</a>
+        <span class="mx-2">/</span>
+        <span class="text-zinc-900">{{ product.name }}</span>
+    </nav>
+
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="flex flex-col md:flex-row">
+            <!-- Изображение -->
+<div class="md:w-1/2 bg-zinc-50 p-8 flex items-center justify-center">
+    <img src="{{ product.image }}" 
+         alt="{{ product.name }}" 
+         class="w-full max-w-md object-cover rounded-lg cursor-pointer product-image"
+         data-images='["{{ product.image }}"]'
+         onclick="openLightbox(JSON.parse(this.dataset.images), 0)">
+</div>
+
+            
+
+            <!-- Информация -->
+            <div class="md:w-1/2 p-8 flex flex-col justify-between">
+                <div>
+                    <span class="inline-block bg-zinc-100 text-zinc-700 text-sm font-medium px-3 py-1 rounded-full mb-4">
+                        {{ product.category }}
+                    </span>
+                    <h1 class="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">{{ product.name }}</h1>
+                    
+                    <div class="flex items-center mb-4">
+                        <span class="text-yellow-500 text-xl">★</span>
+                        <span class="ml-2 text-lg text-zinc-700">{{ product.rating }}</span>
+                        <span class="mx-2 text-zinc-300">|</span>
+                        <span class="text-sm text-zinc-500">(отзывы)</span>
+                    </div>
+
+                    <div class="text-3xl font-bold text-zinc-900 mb-6">
+                        {{ product.price|intcomma }} ₽
+                    </div>
+
+                    <div class="border-t border-zinc-200 pt-6">
+                        <h3 class="text-lg font-semibold text-zinc-800 mb-2">Описание</h3>
+                        <p class="text-zinc-600 leading-relaxed">
+                            {{ product.description|default:"Описание отсутствует" }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Кнопки -->
+                <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                    <button class="add-to-cart flex-1 bg-zinc-900 hover:bg-zinc-800 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2" data-id="{{ product.id }}">
+                        <img src="{% static 'images/icons/shopping-cart-white.svg' %}" alt="В корзину" class="w-5 h-5">
+                        Добавить в корзину
+                    </button>
+                    <a href="{% url 'main:catalog' %}" class="flex-1 border border-zinc-300 hover:bg-zinc-50 text-zinc-700 font-medium py-3 px-6 rounded-lg transition-colors text-center">
+                        Вернуться в каталог
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Блок "Похожие товары" (опционально) -->
+    <!-- Можно добавить позже -->
+</div>
+{% endblock %}
