@@ -148,9 +148,7 @@ cython_debug/
 # Local database
 *.sqlite3
 
-# Static files
-static/
-media/
+
 
 # Django secret key
 .env.local
@@ -214,7 +212,3 @@ Desktop.ini
 # Docker
 # ===========================
 
-.dockerignore
-Dockerfile
-docker-compose.yml
-docker-compose.override.yml
